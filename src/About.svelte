@@ -3,8 +3,8 @@
     <p>Made by CoMiGo Games at 2023 to remind themselves about the obnoxious importance of social media presence.</p>
     <p>Links:</p>
     <ul>
-        <li><a on:click|preventDefault={external} href="https://github.com/CosmoMyzrailGorynych/">GitHub</a></li>
-        <li><a on:click|preventDefault={external} href="https://comigo.itch.io/">itch.io</a></li>
+        <li><a on:click|preventDefault={external} href="https://github.com/CosmoMyzrailGorynych/comigoDeck">GitHub</a></li>
+        <li><a on:click|preventDefault={external} href="https://comigo.itch.io/deck">itch.io</a></li>
         <li><a on:click|preventDefault={external} href="https://ctjs.rocks/">Will also put a link to my game engine ct.js, why not.</a></li>
     </ul>
     <button on:click={() => external('https://boosty.to/comigo/donate')}>
