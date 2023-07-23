@@ -1,0 +1,6 @@
+node_modules
+.vscode
+cache
+public/build
+public/extensions
+build

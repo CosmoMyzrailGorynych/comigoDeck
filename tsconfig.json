@@ -1,0 +1,16 @@
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "include": ["src/**/*"],
+  "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
+  "compilerOptions": {
+    "types": ["chrome", "node", "nw.js", "fs-extra"],
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node16",
+    "paths": {
+      "*": [
+        "./node_modules/*"
+      ]
+    }
+  }
+}

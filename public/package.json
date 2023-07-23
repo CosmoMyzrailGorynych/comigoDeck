@@ -1,0 +1,13 @@
+{
+    "name": "comigo-deck",
+    "version": "0.0.0",
+    "main": "index.html",
+    "node-main": "build/bgPage.js",
+    "window": {
+        "icon": "favicon.png"
+    },
+    "dependencies": {
+        "@cliqz/adblocker-webextension": "^1.26.6",
+        "webextension-polyfill-ts": "^0.26.0"
+    }
+}
