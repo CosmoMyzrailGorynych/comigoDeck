@@ -7,19 +7,25 @@ import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import sprite from 'rollup-plugin-svg-sprite';
 
+import fs from 'fs-extra';
+
 import svelteConfig from './svelte.config.mjs';
 
 import builtinModules from 'builtin-modules';
 import {$} from 'execa';
 import nwbuild from 'nw-builder';
-const nwVersion = '0.76.1';
+const nwVersion = '0.72.0';
 
 const production = process.argv.includes('build');
 
 const baseNwSettings = {
   version: nwVersion,
   srcDir: './public/',
-  glob: false
+  glob: false,
+  icon: 'favicon.ico',
+  app: {
+    icon: 'favicon.ico'
+  }
 };
 function runNw() {
   nwbuild({
@@ -28,8 +34,9 @@ function runNw() {
     flavor: 'sdk',
   })
 };
-function pack() {
-  return Promise.all(['linux', 'osx', 'win'].map(platform => {
+const pack = async () => {
+  await fs.remove('./build');
+  return Promise.all([/*'linux', 'osx',*/ 'win'].map(platform => {
     return nwbuild({
       ...baseNwSettings,
       mode: 'build',

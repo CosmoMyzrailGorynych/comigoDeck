@@ -7,14 +7,16 @@
         <li><a on:click|preventDefault={external} href="https://comigo.itch.io/deck">itch.io</a></li>
         <li><a on:click|preventDefault={external} href="https://ctjs.rocks/">Will also put a link to my game engine ct.js, why not.</a></li>
     </ul>
-    <button on:click={() => external('https://boosty.to/comigo/donate')}>
-        <Icon icon="tip" />
-        <span>Send a tip</span>
-    </button>
-    <button on:click={modal.close}>
-        <Icon icon="x" />
-        <span>Dismiss</span>
-    </button>
+    <span slot="footer">
+        <button on:click={() => external('https://boosty.to/comigo/donate')}>
+            <Icon icon="tip" />
+            <span>Send a tip</span>
+        </button>
+        <button on:click={modal.close}>
+            <Icon icon="x" />
+            <span>Dismiss</span>
+        </button>
+    </span>
 </Modal>
 
 <script lang="ts" type="module">

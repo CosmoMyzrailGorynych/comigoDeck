@@ -1,6 +1,9 @@
 <script lang="ts">
+    import './icons/check.svg';
+
     import Modal from './Modal.svelte';
     let modal: Modal;
+    import Icon from './Icon.svelte';
 
     import * as filter from './filter';
     import AutoLaunch from 'auto-launch';
@@ -29,7 +32,7 @@
         autostartEnabled = !enabled;
     };
     let autostartEnabled = false;
-    autolauncher.isEnabled().then(enabled => autostartEnabled = enabled);
+    autolauncher.isEnabled().then((enabled: boolean) => autostartEnabled = enabled);
 </script>
 
 <Modal on:close bind:this={modal}>
@@ -43,6 +46,10 @@
         <input type="checkbox" bind:checked={autostartEnabled} on:change={toggleAutostart} />
         <span>Automatically start on system start</span>
     </label>
-    <p/>
-    <button on:click={modal.close}>Apply</button>
+    <span slot="footer">
+        <button on:click={modal.close}>
+            <Icon icon="check"/>
+            <span>Apply</span>
+        </button>
+    </span>
 </Modal>

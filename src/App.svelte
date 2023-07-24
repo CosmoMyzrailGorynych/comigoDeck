@@ -4,32 +4,56 @@
       <div class="aFrame" style="width: {frame.width}px;">
         <div class="aFrameBar">
           <button title="(Re)load the initial page" class="square" on:click={reload(ind)}>
-            <Icon icon="reload"/>
+            <Icon small={true} icon="reload"/>
           </button>
           <span>
             <Icon icon="width" />
-            <input title="Width" type="number" min="280" step="8" bind:value={frame.width} on:input={saveFrames}/>
+            <input style="width: 4rem" title="Width" type="number" min="200" step="8" bind:value={frame.width} on:input={saveFrames} />
           </span>
           <div class="aSpacer" />
-          <button class="square" on:click={zoomIn(frame)}>
-            <Icon icon="zoom-in"/>
+          <button class="square" on:click="{() => frameMenu = frameMenu === frame ? null : frame}">
+            <Icon small={true} icon="tool"/>
           </button>
-          <button class="square" on:click={zoomOut(frame)}>
-            <Icon icon="zoom-out"/>
-          </button>
-          {#if ind > 0}
-            <button class="square" on:click={moveBack(ind)}><Icon icon="chevron-left"/></button>
+          {#if frameMenu === frame}
+            <div class="aFrameMenu" transition:fly={{y: 32, duration: 200}}>
+              <label>
+                <span>URL:</span>
+                <br/>
+                <input type="url" bind:value={frame.url} title="URL" on:input={saveFrames}/>
+              </label>
+              <p/>
+              <button class="square" on:click={zoomIn(frame)}>
+                <Icon icon="zoom-in"/>
+                <span>Zoom in</span>
+              </button>
+              <button class="square" on:click={zoomOut(frame)}>
+                <Icon icon="zoom-out"/>
+                <span>Zoom out</span>
+              </button>
+              {#if ind > 0}
+                <button class="square" on:click={moveBack(ind)}>
+                  <Icon icon="chevron-left"/>
+                  <span>Move to the left</span>
+                </button>
+              {/if}
+              {#if ind < (frames.length - 1)}
+                <button class="square" on:click={moveForward(ind)}>
+                  <Icon icon="chevron-right"/>
+                  <span>Move to the right</span>
+                </button>
+              {/if}
+              <button class="square" on:click={deleteFrame(frame)}>
+                <Icon small={true} icon="trash"/>
+                <span>Delete this column</span>
+              </button>
+            </div>
           {/if}
-          {#if ind < (frames.length - 1)}
-            <button class="square" on:click={moveForward(ind)}><Icon icon="chevron-right"/></button>
-          {/if}
-          <button class="square" on:click={deleteFrame(frame)}><Icon icon="trash"/></button>
         </div>
         <div class="aFrameContainer" bind:offsetWidth={frame.containerWidth} bind:offsetHeight={frame.containerHeight}>
-          <iframe
+          <webview
             bind:this={frameRefs[ind]}
             title={frame.url} src={frame.url}
-            nwfaketop="nwfaketop" nwdisable="nwdisable"
+            partition="persist:usercontent"
             style="
               width: {frame.containerWidth / frame.zoom}px;
               height: {frame.containerHeight / frame.zoom}px;
@@ -56,17 +80,16 @@
     </div>
   </div>
   {#if showAddFrame}
-    <div class="aModalWrapper" transition:fade={{duration: 200}} on:click|self={() => showAddFrame = false} role="none">
-      <div class="aModal" transition:fly={{ y: 32, duration: 200 }}>
-        <label>
-          URL:<br />
-          <input type="text" bind:value={newFrame.url} />
-        </label>
-        <label>
-          Width:<br />
-          <input type="number" min="280" step="8" bind:value={newFrame.width}/>
-        </label>
-        <br />
+    <Modal on:close bind:this={settignsModal}>
+      <label>
+        URL:<br />
+        <input type="text" bind:value={newFrame.url} />
+      </label>
+      <label>
+        Width:<br />
+        <input type="number" min="200" step="8" bind:value={newFrame.width}/>
+      </label>
+      <span slot="footer">
         <button on:click={() => (showAddFrame = false)}>
           <Icon icon="x"/>
           Cancel
@@ -75,8 +98,8 @@
           <Icon icon="check"/>
           Add
         </button>
-      </div>
-    </div>
+      </span>
+    </Modal>
   {/if}
   {#if showSettings}
     <Settings on:close={() => showSettings = false} />
@@ -87,7 +110,6 @@
 </main>
 
 <script lang="ts" type="module">
-  import './icons/check.svg';
   import './icons/circle-plus.svg';
   import './icons/ghost.svg';
   import './icons/reload.svg';
@@ -99,12 +121,15 @@
   import './icons/chevron-right.svg';
   import './icons/adjustments.svg';
   import './icons/width.svg';
+  import './icons/tool.svg';
 
   import {fly, fade} from 'svelte/transition';
 
   import Icon from './Icon.svelte';
   import Settings from './Settings.svelte';
   import About from './About.svelte';
+  import Modal from './Modal.svelte';
+  let settignsModal: Modal;
 
   type Frame = {
     url: string;
@@ -194,6 +219,8 @@
     frames = frames;
   };
 
+  let frameMenu: Frame = null;
+
   let showSettings = false;
   let showAbout = false;
 
@@ -222,25 +249,6 @@
     transition opacity 0.25s ease
     &:hover
       opacity 1
-  :global(.aModalWrapper)
-    position fixed
-    z-index 2
-    left 0
-    right 0
-    top 0
-    bottom 0
-    padding 1rem
-    display flex
-    align-items center
-    justify-content center
-    background rgba(bg, 0.65)
-    cursor pointer
-  :global(.aModal)
-    padding 1rem 2rem
-    background bg
-    box-shadow 0 0.25rem 1rem rgba(0, 0, 0, 0.35)
-    max-width 20rem
-    cursor default
   .aSpacer
     flex 1 1 auto
   main
@@ -263,6 +271,8 @@
     gap 0.25rem
     & > *
       flex 1 1 auto
+    & > button
+      margin 0
   .aFramesWrapper
     overflow-y hidden
     overflow-x auto
@@ -278,7 +288,8 @@
     flex 0 0 auto
     display flex
     flex-flow column nowrap
-    iframe
+    iframe, webview
+      display block
       border 0
       border-radius 0.5rem
       width 100%
@@ -291,10 +302,25 @@
     flex 0 0 auto
     display flex
     flex-flow row nowrap
-    padding 0.5rem 1rem
+    padding 0.5rem
     gap 0.25rem
-    input
-      width 4rem
+    & > button //, & > .aButtonGroup
+      margin 0
+    position relative
+  .aFrameMenu
+    position absolute
+    right 0
+    top 100%
+    padding 0.25rem 0.5rem
+    background bg
+    box-shadow 0 0.25rem 1rem rgba(0, 0, 0, 0.35)
+    z-index 2
+    display flex
+    flex-flow column nowrap
+    gap 0.25rem
+    border-radius 0.25rem
+    & > *
+      margin 0
   :global(button)
     color inherit
     background bg2
@@ -307,8 +333,28 @@
     {trans}
     font inherit
     box-sizing border-box
+    margin 0 0.5rem
+    &:first-child
+      margin-left 0
+    &:last-child
+      margin-right 0
     &.square
       padding 0.25rem
+    /*
+    .aButtonGroup &
+      border-radius 0
+      margin 0
+      &:first-child
+        border-top-left-radius 0.25rem
+        border-bottom-left-radius 0.25rem
+      &:last-child
+        border-top-right-radius 0.25rem
+        border-bottom-right-radius 0.25rem
+  :global(.aButtonGroup)
+    margin 0 0.5rem
+    display flex
+    flex-flow row nowrap
+    */
   :global(input)
     color inherit
     background transparent
@@ -323,4 +369,5 @@
     font inherit
   .anAddFrameButton
     border 0
+    margin 0
 </style>
